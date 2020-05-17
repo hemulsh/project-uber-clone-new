@@ -135,7 +135,6 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
     //bemetoda ma kore kaasher lohzim al kaftor button
     private void registerCustomer(String email, String password) {
 
-
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please write Email...", Toast.LENGTH_SHORT).show();
         }
