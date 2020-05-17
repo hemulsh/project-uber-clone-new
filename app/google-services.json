@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "979806256431",
+    "firebase_url": "https://privatasaot1.firebaseio.com",
+    "project_id": "privatasaot1",
+    "storage_bucket": "privatasaot1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979806256431:android:6e2297197b11a9b2cbb5da",
+        "android_client_info": {
+          "package_name": "com.example.privatasaot1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "979806256431-247r7kbughkagb1d2hmvbnqis93adf65.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.privatasaot1",
+            "certificate_hash": "fcbe38739d4447755a152c71f72c7177e6f45e2b"
+          }
+        },
+        {
+          "client_id": "979806256431-uk4poau67uodsrbl9q7holhf7qp98d4h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.privatasaot1",
+            "certificate_hash": "cd2d12076dd820dcb5411e062f36befcee372346"
+          }
+        },
+        {
+          "client_id": "979806256431-oclv7qi8sj0l1qepoo4kclk0pbimhv03.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHoMeF_1baKW2zFAVTHcoFw3Rti6vC-C4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "979806256431-oclv7qi8sj0l1qepoo4kclk0pbimhv03.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

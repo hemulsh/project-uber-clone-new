@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorPrimaryDark"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".DriversMapsActivity" >
+
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintHorizontal_bias="0.0"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/driver_settings_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/background_button"
+        android:text="settings"
+        map:layout_constraintEnd_toStartOf="@+id/driver_logout_button"
+        map:layout_constraintStart_toStartOf="@+id/map"
+        map:layout_constraintTop_toTopOf="@+id/map" />
+
+    <Button
+        android:id="@+id/driver_logout_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/background_button"
+        android:text="logout"
+        map:layout_constraintEnd_toEndOf="@+id/map"
+        map:layout_constraintStart_toEndOf="@+id/driver_settings_button"
+        map:layout_constraintTop_toTopOf="@+id/map" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rel2"
+        android:layout_width="0dp"
+        android:visibility="gone"
+        android:background="@color/cardview_dark_background"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        map:layout_constraintBottom_toBottomOf="@+id/map"
+        map:layout_constraintEnd_toEndOf="@+id/map"
+        map:layout_constraintStart_toStartOf="@+id/map">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+
+            android:id="@+id/profile_image_customer"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+
+            android:layout_margin="20dp"
+
+            android:src="@drawable/profile"
+            map:civ_border_color="#99DDFF"
+            map:civ_border_width="2dp"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/name_customer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:textColor="@color/colorPrimary"
+            android:text="Driver Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            map:layout_constraintStart_toEndOf="@+id/profile_image_customer"
+            map:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/phone_customer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/colorPrimary"
+            android:text="Phone Number"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            map:layout_constraintStart_toEndOf="@+id/profile_image_customer"
+            map:layout_constraintTop_toBottomOf="@+id/name_customer" />
+
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/phonenew"
+            android:tint="@color/colorPrimary"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@android:drawable/stat_sys_phone_call" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
