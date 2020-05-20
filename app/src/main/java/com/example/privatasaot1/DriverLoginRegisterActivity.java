@@ -208,8 +208,8 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
         //lazy-variable:(lazy-loading design-pattern)
         if (loadingBar == null) {
             loadingBar = new ProgressDialog(this);
-            loadingBar.setTitle("Please Wait...");
-            loadingBar.setMessage("Logging you in");
+            loadingBar.setTitle("Please wait");
+            loadingBar.setMessage("While system is performing processing on your data...");
         }
         loadingBar.show();
 
