@@ -1,6 +1,8 @@
 package com.example.privatasaot1;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
@@ -8,19 +10,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static com.google.firebase.auth.FirebaseAuth.*;
 
@@ -33,28 +42,53 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
     private EditText driverPassword;
     private DatabaseReference driversDatabaseRef;
     private FirebaseAuth mAuth;
-    private AuthStateListener firebaseAuthListner;
+    private FirebaseAuth.AuthStateListener firebaseAuthListner;
 
     private ProgressDialog loadingBar;
     private FirebaseUser currentUser;
     String onlineDriverID;
+    //TODO: check the currentUer
+    OnSuccessListener<AuthResult> mSuccesListener = new OnSuccessListener<AuthResult>() {
+        @Override
+        public void onSuccess(AuthResult authResult) {
+
+            if (loadingBar.isShowing()) {
+                loadingBar.dismiss();
+            }
+            onlineDriverID = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+            driversDatabaseRef = FirebaseDatabase.getInstance().getReference("Users").child("Drivers").child(onlineDriverID);
+            driversDatabaseRef.setValue(true);
+
+            Intent intent = new Intent(DriverLoginRegisterActivity.this, DriversMapsActivity.class);
+            DriverLoginRegisterActivity.this.startActivity(intent);
+            finish();
+
+        }
+    };
+    OnFailureListener mFailureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+
+            if (loadingBar.isShowing()) {
+                loadingBar.dismiss();
+            }
+
+            Toast.makeText(DriverLoginRegisterActivity.this, "Login Unsuccessful, Please try Again...", Toast.
+                    LENGTH_SHORT).show();
+
+            showError(e);
+
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_login_register);
 
-        //
+
         mAuth = FirebaseAuth.getInstance();
-
-        firebaseAuthListner = firebaseAuth -> {
-            currentUser = getInstance().getCurrentUser();
-            if (currentUser != null) {
-                Intent intent = new Intent(DriverLoginRegisterActivity.this, DriversMapsActivity.class);
-                startActivity(intent);
-            }
-        };
-
 
         CreateDriverAccount = findViewById(R.id.register_link_driver);
         TitleDriver = findViewById(R.id.driver_status);
@@ -62,8 +96,6 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
         RegisterDriverButton = findViewById(R.id.driver_button_register);
         driverEmail = findViewById(R.id.email_driver);
         driverPassword = findViewById(R.id.password_driver);
-        loadingBar = new ProgressDialog(this);
-
 
         RegisterDriverButton.setVisibility(View.INVISIBLE);
         RegisterDriverButton.setEnabled(false);
@@ -78,92 +110,120 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
             RegisterDriverButton.setEnabled(true);
         });
 
+        firebaseAuthListner = new AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                currentUser = getInstance().getCurrentUser();
+                if (currentUser != null) {
+                    Intent intent = new Intent(DriverLoginRegisterActivity.this, DriversMapsActivity.class);
+                    DriverLoginRegisterActivity.this.startActivity(intent);
+                    finish();
+                }
+            }
+        };
+
 
         RegisterDriverButton.setOnClickListener(view -> {
-            String email = driverEmail.getText().toString();
-            String password = driverPassword.getText().toString();
 
-            if (TextUtils.isEmpty(email)) {
-                Toast.makeText(DriverLoginRegisterActivity.this, "Please write your Email...", Toast.LENGTH_SHORT).show();
-            }
+            register();
 
-            if (TextUtils.isEmpty(password)) {
-                Toast.makeText(DriverLoginRegisterActivity.this, "Please write your Password...", Toast.LENGTH_SHORT).show();
-            } else {
-                loadingBar.setTitle("Please wait :");
-                loadingBar.setMessage("While system is performing processing on your data...");
-                loadingBar.show();
-
-                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        onlineDriverID = mAuth.getCurrentUser().getUid();
-
-                        driversDatabaseRef = FirebaseDatabase.getInstance().getReference("Users").child("Drivers").child(onlineDriverID);
-                        driversDatabaseRef.setValue(true);
-
-                        Intent intent = new Intent(DriverLoginRegisterActivity.this, DriversMapsActivity.class);
-                        startActivity(intent);
-
-                        loadingBar.dismiss();
-                    } else {
-                        Toast.makeText(DriverLoginRegisterActivity.this, "Please Try Again. Error Occurred, while registering... ", Toast.LENGTH_SHORT).show();
-
-                        loadingBar.dismiss();
-                    }
-                });
-            }
         });
 
 
-        LoginDriverButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = driverEmail.getText().toString();
-                String password = driverPassword.getText().toString();
+        LoginDriverButton.setOnClickListener(view -> {
 
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(DriverLoginRegisterActivity.this, "Please write your Email...", Toast.LENGTH_SHORT).show();
-                }
+            login();
 
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(DriverLoginRegisterActivity.this, "Please write your Password...", Toast.LENGTH_SHORT).show();
-                } else {
-                    loadingBar.setTitle("Please wait :");
-                    loadingBar.setMessage("While system is performing processing on your data...");
-                    loadingBar.show();
-
-                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(DriverLoginRegisterActivity.this, "Sign In , Successful...", Toast.LENGTH_SHORT).show();
-
-                                Intent intent = new Intent(DriverLoginRegisterActivity.this, DriversMapsActivity.class);
-                                startActivity(intent);
-                                loadingBar.dismiss();
-                            } else {
-                                Toast.makeText(DriverLoginRegisterActivity.this, "Error Occurred, while Signing In... ", Toast.LENGTH_SHORT).show();
-
-                                loadingBar.dismiss();
-
-                            }
-                        }
-                    });
-                }
-            }
         });
     }
 
+    //new my
+    private void register() {
+        String email = getEmail();
+        String password = getPassword();
 
-  //  @Override
-  //  protected void onStart() {
-  //      super.onStart();
-  //      mAuth.addAuthStateListener(firebaseAuthListner);
-  //  }
-//
-  //  @Override
-  //  protected void onStop() {
-  //      super.onStop();
-  //      mAuth.removeAuthStateListener(firebaseAuthListner);
-  //  }
+        //dont continue if the details are not valid:
+        if (email == null || password == null) {
+            return;
+        }
+
+        shoProgress();
+
+        //register -> addOnsuccess -> addOnFailure
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(mSuccesListener)
+                .addOnFailureListener(mFailureListener);
+    }
+
+
+    //new my
+    private String getEmail() {
+        String email = driverEmail.getText().toString();
+
+        //class Pattern can check if  email or ip address or num of tel
+        Pattern emailAddressRegex = Patterns.EMAIL_ADDRESS;
+        //mather(email).matches()= take the email and check him in a Pattern
+        boolean isEmailValid = emailAddressRegex.matcher(email).matches();
+
+        if (!isEmailValid) {
+            driverEmail.setError("Invalid email address");
+            return null;
+        }
+        return email;
+    }
+
+    //new my
+    private String getPassword() {
+
+        String pass = driverPassword.getText().toString();
+
+        if (pass.length() < 4) {
+            driverPassword.setError("Password must contain at least 4 character");
+            return null;
+        }
+        return pass;
+    }
+
+    //new my
+    private void login() {
+
+        String email = getEmail();
+        String password = getPassword();
+
+        //dont continue if the details are not valid:
+        if (email == null || password == null) {
+            return;
+        }
+        shoProgress();
+
+        //signIn -> addOnSuccess -> addOnFailure
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(mSuccesListener)
+                .addOnFailureListener(mFailureListener);
+    }
+
+    //new my
+    private void shoProgress() {
+        //before use if its null -> init
+        //lazy-variable:(lazy-loading design-pattern)
+        if (loadingBar == null) {
+            loadingBar = new ProgressDialog(this);
+            loadingBar.setTitle("Please Wait...");
+            loadingBar.setMessage("Logging you in");
+        }
+        loadingBar.show();
+
+    }
+
+    //new my
+    private void showError(Exception e) {
+        new AlertDialog.Builder(this).setTitle("An Error Occurred").
+                setMessage(e.getLocalizedMessage()).setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        }).show();
+    }
+
 }

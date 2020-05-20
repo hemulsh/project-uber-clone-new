@@ -3,23 +3,27 @@ package com.example.privatasaot1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
@@ -38,6 +42,53 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
     private String onlineCustomerID;
     private FirebaseUser currentUser;
     private String currentUserId;
+    //new my
+    OnSuccessListener<AuthResult> mSuccessListener = new OnSuccessListener<AuthResult>() {
+        @Override
+        public void onSuccess(AuthResult authResult) {
+            if (loadingBar.isShowing()) {
+                loadingBar.dismiss();
+            }
+
+            currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+            customerDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(currentUserId);
+            customerDatabaseRef.setValue(true);
+
+
+            Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
+            CustomerLoginRegisterActivity.this.startActivity(intent);
+            finish();
+
+
+        }
+    };
+    // metoda onFailureListener=
+    OnFailureListener mFailureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            if (loadingBar.isShowing()) {
+                loadingBar.dismiss();
+            }
+
+            Toast.makeText(CustomerLoginRegisterActivity.
+                    this, "Login Unsuccessful, Please try Again...", Toast.
+                    LENGTH_SHORT).show();
+
+            showError(e);
+        }
+    };
+
+    //new my
+    private void showError(Exception e) {
+        new AlertDialog.Builder(this).setTitle("An Error Occurred").
+                setMessage(e.getLocalizedMessage()).setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        }).show();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +98,15 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        firebaseAuthListener = firebaseAuth -> {
-            currentUser = mAuth.getCurrentUser();
-            if (currentUser != null){
-                Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
-           startActivity(intent);
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                currentUser = mAuth.getCurrentUser();
+                if (currentUser != null) {
+                    Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
+                    CustomerLoginRegisterActivity.this.startActivity(intent);
+                    finish();
+                }
             }
         };
 
@@ -63,9 +118,6 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
         emailCustomer = findViewById(R.id.email_customer);
         passwordCustomer = findViewById(R.id.password_customer);
-
-
-        loadingBar = new ProgressDialog(this);
 
         customerRegisterBtn.setVisibility(View.INVISIBLE);
         customerRegisterBtn.setEnabled(false);
@@ -80,93 +132,87 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
         }));
 
         customerRegisterBtn.setOnClickListener((v -> {
-            String email = emailCustomer.getText().toString();
-            String password = passwordCustomer.getText().toString();
 
-
-            registerCustomer(email, password);// livdok metoda zot
+            register();
         }));
 
         customerLoginBtn.setOnClickListener((v -> {
-            String email = emailCustomer.getText().toString();
-            String password = passwordCustomer.getText().toString();
 
-            signInCustomer(email, password);
+            login();
         }));
 
     }
 
-    //bemetoda zo ma kore kaasher lohzim al lahzan signIn
-    private void signInCustomer(String email, String password) {
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please write Email...", Toast.LENGTH_SHORT).show();
+    //new my
+    private void register() {
+        String email = getEmail();
+        String password = getPassword();
+
+        //dont continue if the details are n   ot valid:
+        if (email == null || password == null) {
+            return;
         }
 
-        if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please write Password", Toast.LENGTH_SHORT).show();
-        } else {
+        showProgress();
 
-            loadingBar.setTitle("Customer login");
-            loadingBar.setMessage("Please wait, while we are chicking your credentials...");
-            loadingBar.show();
-
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-
-                            Toast.makeText(CustomerLoginRegisterActivity.this, "Customer Login Successfully...", Toast.LENGTH_SHORT).show();
-                            Intent customerIntent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
-                            startActivity(customerIntent);
-
-                            loadingBar.dismiss();
-
-                        } else {
-                            Toast.makeText(CustomerLoginRegisterActivity.this, "Login Unsuccessful, Please try Again...", Toast.LENGTH_SHORT).show();
-
-                            loadingBar.dismiss();
-                        }
-                    });
-        }
-
-
+        //register-> addOnSuccess -> addOnFailure
+        mAuth.createUserWithEmailAndPassword(email, password).
+                addOnSuccessListener(mSuccessListener).
+                addOnFailureListener(mFailureListener);
     }
 
+    //new my
+    private void login() {
+        String email = getEmail();
+        String password = getPassword();
 
-    //bemetoda ma kore kaasher lohzim al kaftor button
-    private void registerCustomer(String email, String password) {
-
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please write Email...", Toast.LENGTH_SHORT).show();
+        //dont continue if the details are not valid:
+        if (email == null || password == null) {
+            return;
         }
+        showProgress();
 
-        if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please write Password", Toast.LENGTH_SHORT).show();
-        } else {
+        //register-> addOnSuccess -> addOnFailure
+        mAuth.signInWithEmailAndPassword(email, password).
+                addOnSuccessListener(mSuccessListener).
+                addOnFailureListener(mFailureListener);
+    }
 
+    //new my
+    private String getEmail() {
+        String email = emailCustomer.getText().toString();
+
+        //Patterns.EMAIL_ADDRESS = mean check if email address is valid!!
+        ///you can learn about patterns in google with search ="regex pattern"
+        Pattern emailAddressRegex = Patterns.EMAIL_ADDRESS;
+        boolean isEmailValid = emailAddressRegex.matcher(email).matches();
+        if (!isEmailValid) {
+            emailCustomer.setError("Invalid email address");
+            //return null if email not valid
+            return null;
+        }
+        return email;
+    }
+
+    //new my
+    private String getPassword() {
+        String pass = passwordCustomer.getText().toString();
+
+        if (pass.length() < 4) {
+            passwordCustomer.setError("Password must contain at last 4 characters");
+            //return null if password not valid
+            return null;
+        }
+        return pass;
+    }
+
+    private void showProgress() {
+        if (loadingBar == null) {
+            loadingBar = new ProgressDialog(this);
             loadingBar.setTitle("Please wait");
             loadingBar.setMessage("While system is performing processing on your data...");
-            loadingBar.show();
-
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-
-                            currentUserId = mAuth.getCurrentUser().getUid();
-                            customerDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(currentUserId);
-                            customerDatabaseRef.setValue(true);
-
-                            Toast.makeText(CustomerLoginRegisterActivity.this, "Customer Login Successfully...", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
-                            startActivity(intent);
-
-                            loadingBar.dismiss();
-
-                        } else {
-                            Toast.makeText(CustomerLoginRegisterActivity.this, "Login Unsuccessful, Please try Again...", Toast.LENGTH_SHORT).show();
-
-                            loadingBar.dismiss();
-                        }
-                    });
         }
+        loadingBar.show();
     }
+
 }
