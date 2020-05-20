@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/taxi4" />
+        app:srcCompat="@drawable/imagestaxianother" />
 
     <TextView
         android:id="@+id/customer_status"
@@ -39,7 +39,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
-        android:textColorHint="@color/colorAccent"
+        android:textColorHint="@color/colorPrimary"
         android:ems="10"
         android:hint="Email..."
         android:inputType="textEmailAddress"
@@ -52,7 +52,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:textColorHint="@color/colorAccent"
+        android:textColorHint="@color/colorPrimary"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:ems="15"

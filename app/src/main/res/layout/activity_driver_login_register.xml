@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/taxi3" />
+        app:srcCompat="@drawable/imagestaxi4th" />
 
     <TextView
         android:id="@+id/driver_status"
@@ -35,7 +35,7 @@
     <EditText
         android:id="@+id/email_driver"
         android:layout_width="wrap_content"
-        android:textColorHint="@color/colorAccent"
+        android:textColorHint="@color/colorPrimary"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
@@ -50,7 +50,7 @@
     <EditText
         android:id="@+id/password_driver"
         android:layout_width="wrap_content"
-        android:textColorHint="@color/colorAccent"
+        android:textColorHint="@color/colorPrimary"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
@@ -82,7 +82,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorPrimary"
         android:layout_marginEnd="24dp"
         android:text="Don't have an Account?"
         app:layout_constraintBottom_toTopOf="@+id/driver_button_register"

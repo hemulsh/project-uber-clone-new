@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/taxi2" />
+        app:srcCompat="@drawable/imagestaxi3rd" />
 
     <Button
         android:id="@+id/welcome_button_driver"
