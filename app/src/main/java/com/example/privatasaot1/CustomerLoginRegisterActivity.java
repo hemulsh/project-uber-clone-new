@@ -129,6 +129,7 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
             customerStatus.setText("Driver Registration");
             customerRegisterBtn.setVisibility(View.VISIBLE);
             customerRegisterBtn.setEnabled(true);
+
         }));
 
         customerRegisterBtn.setOnClickListener((v -> {
