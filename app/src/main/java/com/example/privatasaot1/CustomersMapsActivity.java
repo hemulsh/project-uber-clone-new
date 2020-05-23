@@ -58,6 +58,8 @@ public class CustomersMapsActivity extends FragmentActivity implements OnMapRead
 
         com.google.android.gms.location.LocationListener {
 
+
+
     private GoogleMap mMap;
 
     GoogleApiClient googleApiClient;
@@ -91,27 +93,38 @@ public class CustomersMapsActivity extends FragmentActivity implements OnMapRead
     private CircleImageView profilePic;
     private ConstraintLayout relativeLayout;
 
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customers_maps);
+        FirebaseAuth.AuthStateListener mAuthListener = firebaseAuth -> {
 
-        //TODO:  meathel et amufa(mehaber aplikacia le Firebase)
-        //FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+            //TODO:  meathel et amufa(mehaber aplikacia le Firebase)
+            //FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            mAuth = FirebaseAuth.getInstance();
 
-        //TODO: methaber le currentuser beFirebas
-        // (FirebaseUser curentUser = FirebaseAuth.getInstance().getCurrentUser();)
-        currentUser = mAuth.getCurrentUser();
+            //TODO: methaber le currentuser beFirebas
+            // (FirebaseUser curentUser = FirebaseAuth.getInstance().getCurrentUser();)
+            currentUser = mAuth.getCurrentUser();
 
-        //TODO: bodek aim currentUser kayam lifnei shemoshkhim oto meFirebase ki im hu null ihie krisa
-        if (currentUser != null) {
-            //TODO: im meshtamesh kayam, mosheh oto leaplikaciya kidei leavod ito(leishtamesh bo)
-            customerID = mAuth.getCurrentUser().getUid();
-        }else {
-            //kofecet odaa im meshtamesh lo kayam
-            Toast.makeText(this, "meshtamesh lo kayam", Toast.LENGTH_SHORT).show();
-        }
+            //TODO: bodek aim currentUser kayam lifnei shemoshkhim oto meFirebase ki im hu null ihie krisa
+            if (currentUser != null) {
+                //TODO: im meshtamesh kayam, mosheh oto leaplikaciya kidei leavod ito(leishtamesh bo)
+                customerID = mAuth.getCurrentUser().getUid();
+            }else {
+                //kofecet odaa im meshtamesh lo kayam
+                Toast.makeText(CustomersMapsActivity.this, "meshtamesh lo kayam", Toast.LENGTH_SHORT).show();
+           Intent intent = new Intent(CustomersMapsActivity.this, CustomerLoginRegisterActivity.class);
+           startActivity(intent);
+            }
+        };
+
+
+
 
         //TODO: DataBaseReference custumerDatabaseRef; methaber le dataBase shel Firebase kidei
         // leavod ito o leahnis bo masheu

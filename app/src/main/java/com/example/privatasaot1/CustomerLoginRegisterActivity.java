@@ -39,10 +39,10 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private DatabaseReference customerDatabaseRef;
-    private String onlineCustomerID;
     private FirebaseUser currentUser;
-    private String currentUserId;
-    //new my
+    private String onlineCustomerID;
+
+
     OnSuccessListener<AuthResult> mSuccessListener = new OnSuccessListener<AuthResult>() {
         @Override
         public void onSuccess(AuthResult authResult) {
@@ -50,8 +50,8 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
                 loadingBar.dismiss();
             }
 
-            currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-            customerDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(currentUserId);
+            onlineCustomerID = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+            customerDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(onlineCustomerID);
             customerDatabaseRef.setValue(true);
 
 
@@ -98,17 +98,17 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                currentUser = mAuth.getCurrentUser();
-                if (currentUser != null) {
-                    Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
-                    CustomerLoginRegisterActivity.this.startActivity(intent);
-                    finish();
-                }
-            }
-        };
+      // firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+      //     @Override
+      //     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+      //         currentUser = mAuth.getCurrentUser();
+      //         if (currentUser != null) {
+      //             Intent intent = new Intent(CustomerLoginRegisterActivity.this, CustomersMapsActivity.class);
+      //             CustomerLoginRegisterActivity.this.startActivity(intent);
+      //             finish();
+      //         }
+      //     }
+      // };
 
 
         customerLoginBtn = findViewById(R.id.customer_button_login);
@@ -148,7 +148,7 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
         String email = getEmail();
         String password = getPassword();
 
-        //dont continue if the details are n   ot valid:
+        //dont continue if the details are not valid:
         if (email == null || password == null) {
             return;
         }
